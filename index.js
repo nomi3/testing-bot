@@ -40,7 +40,6 @@ client.once(Events.ClientReady, (c) => {
 client.login(process.env.DISCORD_TOKEN);
 
 client.on(Events.MessageCreate, (message) => {
-  console.log(message);
   if (message.content === "ping") {
     message.reply({ content: "Pong!" });
   }
@@ -48,7 +47,7 @@ client.on(Events.MessageCreate, (message) => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
+  console.dir(interaction);
   const command = interaction.client.commands.get(interaction.commandName);
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);

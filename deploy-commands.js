@@ -13,6 +13,7 @@ const commandFiles = fs
 // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
+  console.log(command.data.toJSON());
   commands.push(command.data.toJSON());
 }
 
