@@ -11,36 +11,43 @@ module.exports = {
     .setName("marvel")
     .setDescription("Random Marvel character!"),
   async execute(interaction) {
-    const ts = new Date().getTime();
-    const hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString();
-    const url = `${BASE_URL}?ts=${ts}&apikey=${PUBLIC_KEY}&hash=${hash}`;
+    await interaction.deferReply({ ephemeral: true });
+    try {
+      const ts = new Date().getTime();
+      const hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString();
+      const url = `${BASE_URL}?ts=${ts}&apikey=${PUBLIC_KEY}&hash=${hash}`;
 
-    // const response = await fetch(url);
-    // const data = await response.json();
-    // const total = data.data.total;
-    const total = 1562;
-    const randomIndex = Math.floor(Math.random() * total);
+      const response = await fetch(url);
+      const data = await response.json();
+      const total = data.data.total;
+      // const total = 1562;
+      const randomIndex = Math.floor(Math.random() * total);
 
-    const characterResponse = await fetch(
-      `${url}&limit=1&offset=${randomIndex}`
-    );
-    const characterData = await characterResponse.json();
-    const randomCharacter = characterData.data.results[0];
-    console.log(randomCharacter);
-    const embed = new EmbedBuilder()
-      .setColor(0x0099ff)
-      .setTitle(randomCharacter.name)
-      .setDescription(randomCharacter.description);
+      const characterResponse = await fetch(
+        `${url}&limit=1&offset=${randomIndex}`
+      );
+      const characterData = await characterResponse.json();
+      const randomCharacter = characterData.data.results[0];
 
-    await interaction.reply({
-      content: `your marvel character is ${randomCharacter.name}`,
-      ephemeral: true,
-      embeds: [embed],
-      files: [
-        randomCharacter.thumbnail.path +
-          "." +
-          randomCharacter.thumbnail.extension,
-      ],
-    });
+      const embed = new EmbedBuilder()
+        .setColor(0x0099ff)
+        .setTitle(randomCharacter.name)
+        .setDescription(
+          randomCharacter.description || "No description available."
+        );
+      await interaction.editReply({
+        content: `your marvel character is ${randomCharacter.name}`,
+        embeds: [embed],
+        files: [
+          randomCharacter.thumbnail.path +
+            "." +
+            randomCharacter.thumbnail.extension,
+        ],
+      });
+    } catch (error) {
+      await interaction.editReply({
+        content: "There was an error while executing this command!",
+      });
+    }
   },
 };
