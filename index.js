@@ -47,7 +47,6 @@ client.on(Events.MessageCreate, (message) => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  console.dir(interaction);
   const command = interaction.client.commands.get(interaction.commandName);
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
