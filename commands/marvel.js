@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const CryptoJS = require("crypto-js");
@@ -15,13 +15,27 @@ module.exports = {
     const hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString();
     const url = `${BASE_URL}?ts=${ts}&apikey=${PUBLIC_KEY}&hash=${hash}`;
 
-    const response = await fetch(url);
-    const data = await response.json();
-    const randomIndex = Math.floor(Math.random() * data.data.results.length);
-    const randomCharacter = data.data.results[randomIndex];
+    // const response = await fetch(url);
+    // const data = await response.json();
+    // const total = data.data.total;
+    const total = 1562;
+    const randomIndex = Math.floor(Math.random() * total);
+
+    const characterResponse = await fetch(
+      `${url}&limit=1&offset=${randomIndex}`
+    );
+    const characterData = await characterResponse.json();
+    const randomCharacter = characterData.data.results[0];
+    console.log(randomCharacter);
+    const embed = new EmbedBuilder()
+      .setColor(0x0099ff)
+      .setTitle(randomCharacter.name)
+      .setDescription(randomCharacter.description);
+
     await interaction.reply({
       content: `your marvel character is ${randomCharacter.name}`,
       ephemeral: true,
+      embeds: [embed],
       files: [
         randomCharacter.thumbnail.path +
           "." +
