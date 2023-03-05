@@ -1,23 +1,32 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
-// const URL = "https://gateway.marvel.com:443/v1/public/characters";
-const URL =
-  "https://umayadia-apisample.azurewebsites.net/api/persons/Shakespeare";
+const CryptoJS = require("crypto-js");
+const BASE_URL = "https://gateway.marvel.com:443/v1/public/characters";
+const PUBLIC_KEY = process.env.MARVEL_PUBLIC_KEY;
+const PRIVATE_KEY = process.env.MARVEL_PRIVATE_KEY;
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("marvel")
     .setDescription("Random Marvel character!"),
   async execute(interaction) {
-    // get from marvel api
-    const response = await fetch(URL);
+    const ts = new Date().getTime();
+    const hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString();
+    const url = `${BASE_URL}?ts=${ts}&apikey=${PUBLIC_KEY}&hash=${hash}`;
+
+    const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
+    const randomIndex = Math.floor(Math.random() * data.data.results.length);
+    const randomCharacter = data.data.results[randomIndex];
     await interaction.reply({
-      content: `your marvel character is ${data.data.name}`,
+      content: `your marvel character is ${randomCharacter.name}`,
       ephemeral: true,
-      files: ["https://placehold.jp/3d4070/ffffff/150x150.png"],
+      files: [
+        randomCharacter.thumbnail.path +
+          "." +
+          randomCharacter.thumbnail.extension,
+      ],
     });
   },
 };
