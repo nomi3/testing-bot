@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Events, GatewayIntentBits, Collection } = require("discord.js");
 const dotenv = require("dotenv");
+const { ask } = require("./ai");
 
 dotenv.config();
 
@@ -39,9 +40,21 @@ client.once(Events.ClientReady, (c) => {
 // Log in to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
 
-client.on(Events.MessageCreate, (message) => {
+client.on(Events.MessageCreate, async (message) => {
   if (message.content === "ping") {
     message.reply({ content: "Pong!" });
+  }
+  if (message.mentions.has(client.user)) {
+    try {
+      const trim = message.content.replace(`<@${client.user.id}>`, "").trim();
+      const answer = await ask(trim);
+      message.reply({ content: answer });
+    } catch (error) {
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   }
 });
 
