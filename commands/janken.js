@@ -1,12 +1,11 @@
 // commands/janken.js
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { PermissionFlagsBits } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("janken")
     .setDescription("じゃんけんで対戦するコマンド")
-    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .addUserOption((option) =>
       option
         .setName("opponent")
@@ -47,10 +46,10 @@ module.exports = {
 
     const result = resultMatrix[player1Choice][player2Choice];
 
-    const embed = {
-      color: "#0099ff",
-      title: "じゃんけん結果",
-      fields: [
+    const embed = new EmbedBuilder()
+      .setColor("#0099ff")
+      .setTitle("じゃんけん結果")
+      .addFields(
         {
           name: `${interaction.user.username} (${interaction.user.tag})`,
           value: `手: ${player1Choice}`,
@@ -64,9 +63,8 @@ module.exports = {
         {
           name: "結果",
           value: `${interaction.user.username} の ${result}!`,
-        },
-      ],
-    };
+        }
+      );
 
     await interaction.reply({ embeds: [embed] });
   },
