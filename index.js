@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const { ask } = require("./ai");
 
 dotenv.config();
-
+const koreManager = new Collection();
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -13,6 +13,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
   ],
 });
+client.koreManager = koreManager;
 client.commands = new Collection();
 
 const commandsPath = path.join(__dirname, "commands");
